@@ -1,6 +1,6 @@
 # zetratools
 
-Набор утилит, упрощающих жизнь.
+VS Code extension. Набор утилит, упрощающих жизнь.
 
 ## Zetra: Commit all workspace changes
 
