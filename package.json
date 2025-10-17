@@ -1,0 +1,65 @@
+{
+  "name": "zetratools",
+  "displayName": "ZetraTools",
+  "publisher": "Zetra",
+  "description": "",
+  "license": "ISC",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/golonikum/ztools.git"
+  },
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "zetratools.commitAllChanges",
+        "title": "Zetra: Commit all workspace changes"
+      },
+      {
+        "command": "zetratools.listProjectsPackages",
+        "title": "Zetra: List projects packages"
+      },
+      {
+        "command": "zetratools.cloneAllProjects",
+        "title": "Zetra: Clone all projects"
+      }
+    ],
+    "configuration": {
+      "title": "Zetra tools Extension",
+      "type": "object",
+      "properties": {
+        "zetratools.projectsPath": {
+          "type": "string",
+          "default": "C:\\ZETRA",
+          "description": "Zetra projects path"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.105.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "eslint": "^9.36.0",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
