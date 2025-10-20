@@ -60,7 +60,7 @@ async function commitAllChanges({
   } finally {
     if (count) {
       vscode.window.showInformationMessage(
-        `Successfully committed "${count}" project(s)`
+        `Successfully committed ${count} project(s)`
       );
     } else {
       vscode.window.showWarningMessage("Nothing to commit");
