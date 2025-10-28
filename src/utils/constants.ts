@@ -16,6 +16,7 @@ export const PROJECTS_SRC_MAP = {
   "vesp-ui": "https://gitlab.zetra.space/kub/vesp/ui/vesp-ui",
   "admin-ui": "https://gitlab.zetra.space/kub/admin/admin-ui",
   "inventory-ui": "https://gitlab.zetra.space/kub/inventory/ui/inventory-ui",
+  "pas-ui": "https://gitlab.zetra.space/kub/forecast/ui/pas-ui.git",
 };
 
 export const PROJECTS_COMMANDS_MAP: Partial<

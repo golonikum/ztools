@@ -11,15 +11,28 @@ async function cloneProject({
   dir,
   newPath,
   buildCommand,
+  branch,
 }: {
   newPath: string;
   dir: keyof typeof PROJECTS_SRC_MAP;
   buildCommand?: string;
+  branch?: string;
 }) {
   await execCommand({
     root: newPath,
     command: `git clone ${PROJECTS_SRC_MAP[dir]} ${dir}`,
   });
+
+  if (branch) {
+    try {
+      await execCommand({
+        root: newPath,
+        dir,
+        command: `git checkout ${branch}`,
+      });
+    } catch (e) {}
+  }
+
   await execCommand({ root: newPath, dir, command: "yarn" });
 
   if (buildCommand) {
@@ -27,7 +40,10 @@ async function cloneProject({
   }
 }
 
-async function cloneAllProjects(newPath: string): Promise<string> {
+async function cloneAllProjects(
+  newPath: string,
+  branch?: string
+): Promise<string> {
   const startDate = new Date();
 
   const keys = Object.keys(
@@ -40,7 +56,7 @@ async function cloneAllProjects(newPath: string): Promise<string> {
     const buildCommand = PROJECTS_COMMANDS_MAP[dir];
 
     if (syncDirs.includes(dir)) {
-      await cloneProject({ dir, buildCommand, newPath });
+      await cloneProject({ dir, buildCommand, newPath, branch });
     }
   }
 
@@ -54,6 +70,7 @@ async function cloneAllProjects(newPath: string): Promise<string> {
               dir,
               buildCommand: PROJECTS_COMMANDS_MAP[dir],
               newPath,
+              branch,
             });
             resolve(true);
           })
@@ -86,6 +103,11 @@ export async function readInputAndCloneAllProjects() {
     return;
   }
 
+  const branch = await vscode.window.showInputBox({
+    value: "",
+    placeHolder: "Git бранч, например PROM-1234 (можно оставить пустым)",
+  });
+
   if (!fs.existsSync(newPath)) {
     try {
       fs.mkdirSync(newPath, { recursive: true });
@@ -103,7 +125,7 @@ export async function readInputAndCloneAllProjects() {
     async (progress) => {
       progress.report({ increment: 0, message: "in progress..." });
 
-      const completeMessage = await cloneAllProjects(newPath);
+      const completeMessage = await cloneAllProjects(newPath, branch);
       progress.report({ increment: 100, message: completeMessage });
       vscode.window.showInformationMessage(completeMessage);
 

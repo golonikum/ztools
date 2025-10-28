@@ -18,6 +18,7 @@ const PROJECTS = {
   "vesp-ui": "vesp-ui",
   "worker-ui": "worker-ui",
   "inventory-ui": "inventory-ui",
+  "pas-ui": "pas-ui",
 };
 
 type ItemType = {
