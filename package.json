@@ -15,6 +15,11 @@
   "categories": [
     "Other"
   ],
+  "activationEvents": [
+    "onCommand:zetratools.commitAllChanges",
+    "onCommand:zetratools.listProjectsPackages",
+    "onCommand:zetratools.cloneAllProjects"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [

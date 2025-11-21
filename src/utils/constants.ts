@@ -6,7 +6,7 @@ export const PROJECTS_ROOT_PATH: string | undefined = vscode.workspace
 
 export const GIT_DOMAIN: string | undefined = vscode.workspace
   .getConfiguration("zetratools")
-  .get("projectsPath");
+  .get("gitDomain");
 
 export const PROJECTS_SRC_MAP = {
   "developer-kit": `${GIT_DOMAIN}/kub/platform/ui/developer-kit`,
