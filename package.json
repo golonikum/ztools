@@ -39,6 +39,11 @@
           "type": "string",
           "default": "C:\\ZETRA",
           "description": "Zetra projects path"
+        },
+        "zetratools.gitDomain": {
+          "type": "string",
+          "default": "https://gitlab.zetra.space",
+          "description": "Zetra Git domain host url"
         }
       }
     }

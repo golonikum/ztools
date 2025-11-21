@@ -50,13 +50,13 @@ async function commitAllChanges({
   let count = 0;
 
   try {
-    for (let dir of keys) {
+    const promises = keys.map(async (dir) => {
       const committed = await tryCommitProject({ dir, branch, message });
+      return committed ? 1 : 0;
+    });
 
-      if (committed) {
-        count++;
-      }
-    }
+    const results = await Promise.all(promises);
+    count = results.reduce<number>((sum, result) => sum + result, 0);
   } finally {
     if (count) {
       vscode.window.showInformationMessage(
