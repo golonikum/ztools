@@ -34,15 +34,6 @@ async function tryCommitProject({
       command: `git push origin ${branch}`,
     });
     const mrUrl = extractMergeRequestUrl(pushOutput);
-    //       .replace(/\n/gim, " ")
-    //       .replace(/^.+(https[^\s]+).*$/gim, "$1");
-
-    console.log("mrUrl", mrUrl);
-    //     console.log("vscode.Uri.parse(mrUrl)", vscode.Uri.parse(mrUrl));
-
-    //     /*
-    // warning: redirecting to https://gitlab.zetra.space/kub/man/ui/worker-ui.git/ remote: remote: To create a merge request for PROM-000, visit:         remote:   https://gitlab.zetra.space/kub/man/ui/worker-ui/-/merge_requests/new?merge_request%5Bsource_branch%5D=PROM-000         remote:  To https://gitlab.zetra.space/kub/man/ui/worker-ui
-    //     */
 
     await vscode.env.openExternal(vscode.Uri.parse(mrUrl));
     committed = true;

@@ -1,9 +1,4 @@
 export const extractMergeRequestUrl = (inputString: string) => {
-  // The input string
-  // const inputString = `
-  // warning: redirecting to https://gitlab.zetra.space/kub/man/ui/worker-ui.git/ remote: remote: To create a merge request for PROM-000, visit:         remote:   https://gitlab.zetra.space/kub/man/ui/worker-ui/-/merge_requests/new?merge_request%5Bsource_branch%5D=PROM-000         remote:  To https://gitlab.zetra.space/kub/man/ui/worker-ui
-  // `;
-
   /**
    * A regular expression to find URLs in a string.
    *
@@ -27,7 +22,6 @@ export const extractMergeRequestUrl = (inputString: string) => {
   const extractedUrls = Array.from(matches, (match) => match[0]);
 
   // Print the result
-  console.log(extractedUrls);
   const url = extractedUrls.find((item) => item.includes("merge_requests/new"));
 
   return url || "";
