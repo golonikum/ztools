@@ -4,6 +4,7 @@ import {
   PROJECTS_SRC_MAP,
   execCommand,
   getProjectsRootPath,
+  getProjectsSrcMap,
 } from "../utils";
 import fs from "fs";
 
@@ -18,9 +19,10 @@ async function cloneProject({
   buildCommand?: string;
   branch?: string;
 }) {
+  const REAL_PROJECTS_SRC_MAP = getProjectsSrcMap();
   await execCommand({
     root: newPath,
-    command: `git clone ${PROJECTS_SRC_MAP[dir]} ${dir}`,
+    command: `git clone ${REAL_PROJECTS_SRC_MAP[dir]} ${dir}`,
   });
 
   if (branch) {
@@ -45,9 +47,9 @@ async function cloneAllProjects(
   branch?: string
 ): Promise<string> {
   const startDate = new Date();
-
+  const REAL_PROJECTS_SRC_MAP = getProjectsSrcMap();
   const keys = Object.keys(
-    PROJECTS_SRC_MAP
+    REAL_PROJECTS_SRC_MAP
   ) as (keyof typeof PROJECTS_SRC_MAP)[];
 
   const syncDirs = ["developer-kit", "core-api"];
