@@ -14,7 +14,7 @@ const PROJECTS = {
   "geo-ui": "geo-ui",
   "manager-ui": "manager-ui",
   "simulator-ui": "simulator-ui",
-  "forces-ui": "forces-ui",
+  "forces-widgets": "forces-widgets",
   "project-widgets": "project-widgets",
   "vesp-ui": "vesp-ui",
   "worker-ui": "worker-ui",

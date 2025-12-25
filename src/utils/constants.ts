@@ -4,7 +4,7 @@ export const PROJECTS_SRC_MAP = {
   "core-ui": "GIT_DOMAIN/kub/platform/ui/core-ui",
   "simulator-ui": "GIT_DOMAIN/kub/forecast/simulator-ui",
   "geo-ui": "GIT_DOMAIN/kub/geo/ui",
-  "forces-ui": "GIT_DOMAIN/kub/man/ui/forces-ui",
+  "forces-widgets": "GIT_DOMAIN/kub/man/ui/forces-ui",
   "manager-ui": "GIT_DOMAIN/kub/man/ui/manager-ui",
   "worker-ui": "GIT_DOMAIN/kub/man/ui/worker-ui",
   "vesp-ui": "GIT_DOMAIN/kub/vesp/ui/vesp-ui",
