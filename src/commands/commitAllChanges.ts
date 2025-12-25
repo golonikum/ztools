@@ -25,7 +25,7 @@ async function tryCommitProject({
       await execCommand({ dir, command: "git add ." });
       await execCommand({
         dir,
-        command: `git commit -m "${branch}: ${message}"`,
+        command: `git commit -m "${branch}: ${message.replace(/"/g, '\\"')}"`,
       });
     }
 
