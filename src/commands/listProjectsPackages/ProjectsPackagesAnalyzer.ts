@@ -1,39 +1,19 @@
 import path from "path";
+import fs from "fs";
 import * as vscode from "vscode";
 import { CacheManager } from "./CacheManager";
 import { DependenciesAnalyzer } from "./DependenciesAnalyzer";
 import { ErrorHandler } from "./ErrorHandler";
 import { HtmlReportGenerator } from "./HtmlReportGenerator";
 import { PackageExtractor } from "./PackageExtractor";
-import { ReportManager } from "./ReportManager";
 import { AnalyzerConfig, ProjectInfo } from "./types";
 import { getProjectsRootPath } from "../../utils";
+import { ProjectsExplorer } from "./ProjectsExplorer";
 
 /**
  * Основной класс для анализа и визуализации зависимостей в проектах
  */
 export class ProjectsPackagesAnalyzer {
-  // Определение проектов и их путей
-  // TODO: сделать автоматически
-  private readonly PROJECTS: Record<string, string> = {
-    "admin-ui": "admin-ui",
-    "core-api": "core-api",
-    "core-ui": "core-ui",
-    "global-config": "developer-kit/packages/global-config",
-    "linter-config": "developer-kit/packages/linter-config",
-    "test-utils": "developer-kit/packages/test-utils",
-    "webpack-config": "developer-kit/packages/webpack-config",
-    "geo-ui": "geo-ui",
-    "manager-ui": "manager-ui",
-    "simulator-ui": "simulator-ui",
-    "forces-widgets": "forces-widgets",
-    "project-widgets": "project-widgets",
-    "vesp-ui": "vesp-ui",
-    "worker-ui": "worker-ui",
-    "inventory-ui": "inventory-ui",
-    "pas-ui": "pas-ui",
-  };
-
   // Конфигурация анализатора
   private config: AnalyzerConfig;
 
@@ -42,7 +22,6 @@ export class ProjectsPackagesAnalyzer {
   private packageExtractor: PackageExtractor;
   private dependenciesAnalyzer: DependenciesAnalyzer;
   private htmlReportGenerator: HtmlReportGenerator;
-  private reportManager: ReportManager;
   private errorHandler: ErrorHandler;
 
   /**
@@ -53,10 +32,10 @@ export class ProjectsPackagesAnalyzer {
     // Конфигурация по умолчанию
     this.config = {
       outputFileName: "projects-packages-statistics.html",
-      showOnlyConflicts: false,
-      enableCache: true,
-      includeDevDependencies: true,
       cacheFilePath: path.join(process.cwd(), ".packages-cache.json"),
+      showOnlyConflicts: false,
+      enableCache: false,
+      includeDevDependencies: true,
       ...config,
     };
 
@@ -65,7 +44,6 @@ export class ProjectsPackagesAnalyzer {
     this.packageExtractor = new PackageExtractor(this.config);
     this.dependenciesAnalyzer = new DependenciesAnalyzer();
     this.htmlReportGenerator = new HtmlReportGenerator();
-    this.reportManager = new ReportManager();
     this.errorHandler = new ErrorHandler();
   }
 
@@ -77,19 +55,22 @@ export class ProjectsPackagesAnalyzer {
       const projectsRootPath = this.getProjectsRootPath();
       if (!projectsRootPath) return;
 
+      const projectsExplorer = new ProjectsExplorer(projectsRootPath);
+      const projects = projectsExplorer.getAll();
+
       // Проверяем актуальность кэша
       let items: ProjectInfo[];
 
-      if (this.cacheManager.isCacheValid(projectsRootPath, this.PROJECTS)) {
+      if (this.cacheManager.isCacheValid(projects)) {
         console.log("Использование кэшированных данных");
         items = this.cacheManager.getFromCache() || [];
       } else {
         console.log("Обновление данных о пакетах");
         items = this.packageExtractor.extractAllProjectsPackages(
           projectsRootPath,
-          this.PROJECTS
+          projects
         );
-        this.cacheManager.updateCache(projectsRootPath, items, this.PROJECTS);
+        this.cacheManager.updateCache(items, projects);
       }
 
       // Собираем все зависимости
@@ -126,7 +107,7 @@ export class ProjectsPackagesAnalyzer {
       const fullHtml = this.htmlReportGenerator.wrapHtml(tableHtml);
 
       // Сохранение и открытие отчета
-      await this.reportManager.saveAndOpenReport(
+      await this.saveAndOpenReport(
         projectsRootPath,
         fullHtml,
         this.config.outputFileName
@@ -151,5 +132,32 @@ export class ProjectsPackagesAnalyzer {
     }
 
     return projectsRootPath;
+  }
+
+  /**
+   * Сохраняет HTML-отчет и открывает его в браузере
+   * @param projectsRootPath - корневой путь к проектам
+   * @param htmlContent - HTML-содержимое отчета
+   * @param outputFileName - имя выходного файла
+   */
+  private async saveAndOpenReport(
+    projectsRootPath: string,
+    htmlContent: string,
+    outputFileName: string
+  ): Promise<void> {
+    // Сохранение HTML-файла
+    const filePath = path.resolve(projectsRootPath, outputFileName);
+
+    fs.writeFileSync(filePath, htmlContent, {
+      encoding: "utf8",
+    });
+
+    // Открытие файла в браузере
+    const fileUri = vscode.Uri.file(filePath);
+    await vscode.env.openExternal(fileUri);
+
+    vscode.window.showInformationMessage(
+      `Отчет о зависимостях создан: ${filePath}`
+    );
   }
 }

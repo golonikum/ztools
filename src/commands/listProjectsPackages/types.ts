@@ -19,8 +19,10 @@ export interface AnalyzerConfig {
  */
 export interface ProjectInfo {
   projectName: string;
+  projectPath: string;
   dependencies: Record<string, string>;
   devDependencies?: Record<string, string>;
+  realVersions?: Record<string, string>;
 }
 
 /**
@@ -30,3 +32,7 @@ export interface CacheData {
   timestamp: number;
   projects: Record<string, { lastModified: number; data: ProjectInfo }>;
 }
+
+export type ProjectType = string;
+
+export type ProjectsMapType = Record<string, ProjectType>;

@@ -17,8 +17,8 @@
   ],
   "activationEvents": [
     "onCommand:zetratools.commitAllChanges",
-    "onCommand:zetratools.listProjectsPackages",
-    "onCommand:zetratools.cloneAllProjects"
+    "onCommand:zetratools.cloneAllProjects",
+    "onCommand:zetratools.listAllProjectsPackages"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -28,12 +28,12 @@
         "title": "Zetra: Commit all workspace changes"
       },
       {
-        "command": "zetratools.listProjectsPackages",
-        "title": "Zetra: List projects packages"
-      },
-      {
         "command": "zetratools.cloneAllProjects",
         "title": "Zetra: Clone all projects"
+      },
+      {
+        "command": "zetratools.listAllProjectsPackages",
+        "title": "Zetra: List all projects packages"
       }
     ],
     "configuration": {

@@ -55,10 +55,7 @@ export class CacheManager {
    * @param projectsMap - карта проектов и их путей
    * @returns true, если кэш актуальный, иначе false
    */
-  public isCacheValid(
-    projectsRootPath: string,
-    projectsMap: Record<string, string>
-  ): boolean {
+  public isCacheValid(projectsMap: Record<string, string>): boolean {
     if (!this.cache || !this.config.enableCache) {
       return false;
     }
@@ -71,10 +68,10 @@ export class CacheManager {
 
     // Проверяем, что файлы package.json не изменялись с момента кэширования
     for (const [project, cachedData] of Object.entries(this.cache.projects)) {
-      if (!projectsMap[project]) continue; // Пропускаем проекты, которых больше нет в карте
+      if (!projectsMap[project]) continue; // Пропускаем проекты, которых больше нет
 
       const packageJsonPath = path.resolve(
-        projectsRootPath,
+        // projectsRootPath,
         projectsMap[project],
         "package.json"
       );
@@ -99,7 +96,6 @@ export class CacheManager {
    * @param projectsMap - карта проектов и их путей
    */
   public updateCache(
-    projectsRootPath: string,
     items: ProjectInfo[],
     projectsMap: Record<string, string>
   ): void {
@@ -114,7 +110,6 @@ export class CacheManager {
 
     items.forEach((item) => {
       const packageJsonPath = path.resolve(
-        projectsRootPath,
         projectsMap[item.projectName],
         "package.json"
       );

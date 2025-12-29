@@ -1,3 +1,4 @@
+import { isPackageVersionNotObvious } from "../../utils";
 import { ProjectInfo } from "./types";
 
 /**
@@ -22,14 +23,20 @@ export class HtmlReportGenerator {
     }
 
     table {
-      border-collapse: collapse;
+      border-spacing: 4px;
+      border-collapse: separate;
+      border: 1px solid #ddd;
       width: 100%;
     }
 
     th, td {
       padding: 8px;
-      text-align: left;
+      text-align: center;
       border: 1px solid #ddd;
+    }
+
+    th:first-child, td:first-child {
+      text-align: left;
     }
 
     th {
@@ -58,7 +65,7 @@ export class HtmlReportGenerator {
   </style>
 </head>
 <body>
-<table>
+<table cellspacing="4px">
 ${body}
 </table>
 </body>
@@ -82,8 +89,9 @@ ${body}
    * @returns ячейка таблицы в виде HTML-строки
    */
   public createVersionCell(version: string): string {
-    const isCaretVersion = version.includes("^");
-    return `<td class="${isCaretVersion ? "highlighted" : ""}">${version}</td>`;
+    return `<td class="${
+      isPackageVersionNotObvious(version) ? "highlighted" : ""
+    }">${version}</td>`;
   }
 
   /**
@@ -112,12 +120,17 @@ ${body}
           includeDevDependencies && item.devDependencies
             ? item.devDependencies[packageName] || ""
             : "";
+        const realVersion = item.realVersions?.[packageName] || "";
 
         // Если есть и dev, и prod версии, показываем обе через запятую
-        const displayVersion =
+        let displayVersion =
           version && devVersion
             ? `${version}, ${devVersion}`
             : version || devVersion;
+
+        if (realVersion) {
+          displayVersion = `${displayVersion} (${realVersion})`;
+        }
 
         return this.createVersionCell(displayVersion);
       })
@@ -172,17 +185,26 @@ ${body}
     includeDevDependencies: boolean,
     hasVersionConflicts: (packageName: string) => boolean
   ): string {
+    const filteredItems = items.filter((item) => this.needToShow(item));
+
     // Создание заголовка таблицы
-    const tableHead = this.createTableHead(items);
+    const tableHead = this.createTableHead(filteredItems);
 
     // Создание строк таблицы
     const tableRows = this.createTableRows(
-      items,
+      filteredItems,
       dependencies,
       includeDevDependencies,
       hasVersionConflicts
     );
 
     return `${tableHead}${tableRows}`;
+  }
+
+  private needToShow(item: ProjectInfo) {
+    return (
+      !!Object.keys(item.dependencies).length ||
+      !!Object.keys(item.devDependencies || {}).length
+    );
   }
 }

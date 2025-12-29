@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 import {
-  listProcessProjects,
   readInputAndCloneAllProjects,
   readInputsAndCommitAllChanges,
+  listAllProcessProjects,
 } from "./commands";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -11,19 +11,19 @@ export function activate(context: vscode.ExtensionContext) {
     async () => readInputsAndCommitAllChanges()
   );
 
-  const listProjectsPackagesCommand = vscode.commands.registerCommand(
-    "zetratools.listProjectsPackages",
-    async () => listProcessProjects()
-  );
-
   const cloneAllProjectsCommand = vscode.commands.registerCommand(
     "zetratools.cloneAllProjects",
     async () => readInputAndCloneAllProjects()
   );
 
+  const listAllProjectsPackagesCommand = vscode.commands.registerCommand(
+    "zetratools.listAllProjectsPackages",
+    async () => listAllProcessProjects()
+  );
+
   context.subscriptions.push(commitAllChangesCommand);
-  context.subscriptions.push(listProjectsPackagesCommand);
   context.subscriptions.push(cloneAllProjectsCommand);
+  context.subscriptions.push(listAllProjectsPackagesCommand);
 }
 
 export function deactivate() {}
