@@ -1,7 +1,7 @@
-import path from "path";
-import fs from "fs";
-import { AnalyzerConfig, ProjectInfo } from "./types";
-import { isPackageVersionNotObvious } from "../../utils";
+import * as path from "path";
+import * as fs from "fs";
+import { ProjectInfo } from "./types";
+import { isPackageVersionNotObvious } from "../../utils/isPackageVersionNotObvious";
 
 type ReturnPackageInfoType = Pick<
   ProjectInfo,
@@ -12,7 +12,7 @@ type ReturnPackageInfoType = Pick<
  * Класс для извлечения информации о пакетах
  */
 export class PackageExtractor {
-  constructor(private config: AnalyzerConfig) {}
+  constructor(private includeDevDependencies: boolean = false) {}
 
   /**
    * Извлекает информацию о зависимостях проекта из package.json
@@ -47,7 +47,7 @@ export class PackageExtractor {
         ),
       };
 
-      if (this.config.includeDevDependencies && packageObj.devDependencies) {
+      if (this.includeDevDependencies && packageObj.devDependencies) {
         result.devDependencies = this.filterOutLinkedDependencies(
           packageObj.devDependencies
         );
@@ -83,7 +83,7 @@ export class PackageExtractor {
       project.dependencies || {}
     );
 
-    const notObviousDevDependencies = this.config.includeDevDependencies
+    const notObviousDevDependencies = this.includeDevDependencies
       ? this.notObviousVersionsPackages(project.devDependencies || {})
       : [];
 

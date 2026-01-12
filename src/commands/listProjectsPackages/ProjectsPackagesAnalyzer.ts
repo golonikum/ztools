@@ -37,7 +37,9 @@ export class ProjectsPackagesAnalyzer {
     };
 
     // Инициализация менеджеров
-    this.packageExtractor = new PackageExtractor(this.config);
+    this.packageExtractor = new PackageExtractor(
+      this.config.includeDevDependencies
+    );
     this.dependenciesAnalyzer = new DependenciesAnalyzer();
     this.htmlReportGenerator = new HtmlReportGenerator();
     this.errorHandler = new ErrorHandler();
@@ -49,7 +51,9 @@ export class ProjectsPackagesAnalyzer {
   public async generateReport(): Promise<void> {
     try {
       const projectsRootPath = this.getProjectsRootPath();
-      if (!projectsRootPath) return;
+      if (!projectsRootPath) {
+        return;
+      }
 
       const projectsExplorer = new ProjectsExplorer(projectsRootPath);
       const projects = projectsExplorer.getAll();
