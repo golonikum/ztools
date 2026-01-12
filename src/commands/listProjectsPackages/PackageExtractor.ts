@@ -3,6 +3,11 @@ import fs from "fs";
 import { AnalyzerConfig, ProjectInfo } from "./types";
 import { isPackageVersionNotObvious } from "../../utils";
 
+type ReturnPackageInfoType = Pick<
+  ProjectInfo,
+  "dependencies" | "devDependencies" | "realVersions"
+>;
+
 /**
  * Класс для извлечения информации о пакетах
  */
@@ -11,25 +16,22 @@ export class PackageExtractor {
 
   /**
    * Извлекает информацию о зависимостях проекта из package.json
-   * @param projectPath - путь к проекту
-   * @param projectName - имя проекта
-   * @returns объект с информацией о проекте и его зависимостях
+   * @param projectsRootPath Корневой путь, где находятся все проекты.
+   * @param projectPath Путь к проекту.
+   * @returns Объект с информацией о зависимостях.
    */
   private extractProjectPackages(
     projectsRootPath: string,
-    projectPath: string,
-    projectName: string
-  ): ProjectInfo {
+    projectPath: string
+  ): ReturnPackageInfoType {
     try {
       const packageJsonPath = path.resolve(projectPath, "package.json");
 
       // Проверка существования файла
       if (!fs.existsSync(packageJsonPath)) {
-        console.warn(`Файл package.json не найден для проекта: ${projectName}`);
+        console.warn(`Файл package.json не найден для проекта: ${projectPath}`);
         return {
-          projectName,
           dependencies: {},
-          projectPath,
         };
       }
 
@@ -39,9 +41,7 @@ export class PackageExtractor {
 
       const packageObj = JSON.parse(packageFileContent);
 
-      const result: ProjectInfo = {
-        projectName,
-        projectPath,
+      const result: ReturnPackageInfoType = {
         dependencies: this.filterOutLinkedDependencies(
           packageObj.dependencies || {}
         ),
@@ -53,14 +53,12 @@ export class PackageExtractor {
         );
       }
 
-      this.processNotObviousVersions(projectsRootPath, result);
+      this.processNotObviousVersions(projectsRootPath, projectPath, result);
 
       return result;
     } catch (error) {
-      console.error(`Ошибка при обработке проекта ${projectName}:`, error);
+      console.error(`Ошибка при обработке проекта ${projectPath}:`, error);
       return {
-        projectName,
-        projectPath,
         dependencies: {},
       };
     }
@@ -73,11 +71,13 @@ export class PackageExtractor {
    * и пытается определить их реальные установленные версии, сохраняя результат в `project.realVersions`.
    *
    * @param projectsRootPath Корневой путь, где находятся все проекты.
+   * @param projectPath Путь к проекту.
    * @param project Объект с информацией о текущем обрабатываемом проекте.
    */
   private processNotObviousVersions(
     projectsRootPath: string,
-    project: ProjectInfo
+    projectPath: string,
+    project: ReturnPackageInfoType
   ) {
     const notObviousDependencies = this.notObviousVersionsPackages(
       project.dependencies || {}
@@ -89,7 +89,7 @@ export class PackageExtractor {
 
     if (notObviousDependencies.length || notObviousDevDependencies.length) {
       console.warn(
-        `В проекте ${project.projectName} найдены неочевидные версии пакетов ${[
+        `В проекте ${projectPath} найдены неочевидные версии пакетов ${[
           ...notObviousDependencies,
           ...notObviousDevDependencies,
         ].join(", ")}`
@@ -103,7 +103,7 @@ export class PackageExtractor {
           ...res,
           [dep]: this.findRealVersionOfPackage(
             projectsRootPath,
-            project.projectPath,
+            projectPath,
             dep
           ),
         }),
@@ -183,20 +183,21 @@ export class PackageExtractor {
 
   /**
    * Извлекает информацию о пакетах для всех проектов
-   * @param projectsRootPath - корневой путь к проектам
-   * @param projectsMap - карта проектов и их путей
-   * @returns массив объектов с информацией о проектах и их зависимостях
+   * @param projectsRootPath Корневой путь к проектам.
+   * @param projectsMap Карта проектов и их путей.
+   * @returns Массив объектов с информацией о проектах и их зависимостях.
    */
   public extractAllProjectsPackages(
     projectsRootPath: string,
     projectsMap: Record<string, string>
   ): ProjectInfo[] {
-    return Object.keys(projectsMap).map((projectName) =>
-      this.extractProjectPackages(
+    return Object.keys(projectsMap).map((projectName) => ({
+      ...this.extractProjectPackages(
         projectsRootPath,
-        projectsMap[projectName],
-        projectName
-      )
-    );
+        projectsMap[projectName]
+      ),
+      projectName,
+      projectPath: projectsMap[projectName],
+    }));
   }
 }

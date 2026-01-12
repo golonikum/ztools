@@ -6,12 +6,8 @@ export interface AnalyzerConfig {
   outputFileName: string;
   /** Показывать только пакеты с конфликтами версий */
   showOnlyConflicts: boolean;
-  /** Кэшировать результаты анализа */
-  enableCache: boolean;
   /** Включать dev-зависимости в анализ */
   includeDevDependencies: boolean;
-  /** Путь к файлу кэша */
-  cacheFilePath?: string;
 }
 
 /**
